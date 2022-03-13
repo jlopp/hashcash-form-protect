@@ -152,8 +152,12 @@ function hc_CheckNonce(difficulty, stamp, nonce) {
   return (check_bits == 0);
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // iterate through as many nonces as it takes to find one that gives us a solution hash at the target difficulty
-function hc_findHash() {
+async function hc_findHash() {
   var hc_stamp = getFormData('hc_stamp');
   var hc_difficulty = getFormData('hc_difficulty');
 
@@ -167,12 +171,19 @@ function hc_findHash() {
 
   var nonce = 1;
 
-  while(!hc_CheckNonce(hc_difficulty, hc_stamp, nonce))
+  while(!hc_CheckNonce(hc_difficulty, hc_stamp, nonce)) {
     nonce++;
+    if (nonce % 10000 == 0) {
+      let remaining = Math.round((Math.pow(2, hc_difficulty) - nonce) / 10000) * 10000;
+      document.getElementById('countdown').innerHTML = "     Approximately " + remaining + " hashes remaining before form unlocks.";
+      await sleep(100); // don't peg the CPU and prevent the browser from rendering these updates
+    }
+  }
 
   setFormData('hc_nonce', nonce);
 
   // we have a valid nonce; enable the form submit button
+  document.getElementById('countdown').innerHTML = "";
   document.getElementById('submitbutton').disabled = false;
 
   return true;

@@ -20,7 +20,7 @@ const HASHCASH_SALT = "";
  * 25-28: 10,000,000
  * 29-32: 100,000,000
  */
-const HASHCASH_DIFFICULTY = 18;
+const HASHCASH_DIFFICULTY = 19;
 
 // time flexibility, in minutes, between stamp generation and expiration
 // allows time for clock drift and for filling out form

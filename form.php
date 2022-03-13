@@ -16,6 +16,7 @@
 	        <input type="text" id="subject" name="subject" placeholder="Subject..." value="<?=$_POST["subject"]?>"><span style="color:red"><?= $subjectError; ?></span><br/><br/>
 	        <textarea id="emailBody" name="emailBody" placeholder="Write your message here." style="height:200px"><?=$_POST["emailBody"]?></textarea><span style="color:red"><?= $messageError; ?></span><br/><br/>
 			<input type="submit" name="submit" value="Submit" id="submitbutton" disabled>
+			<span id="countdown" style="color:red"></span>
 		</form>
 	</body>
 </html>
