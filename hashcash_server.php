@@ -8,6 +8,9 @@ const SUCCESS_URL = "";
 // set this to a random string
 const HASHCASH_SALT = "";
 
+// set this to a path and file name to store recently submitted stamps
+const STAMP_LOG = "";
+
 /*
  * number of bits to collide
  * Approximate number of hash guesses needed for difficulty target of:
@@ -68,6 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
 
   if ($nameError || $emailError || $subjectError || $messageError || $formError)
     return;
+
+  // log that this puzzle has been used
+  file_put_contents(STAMP_LOG, $_POST['hc_stamp'] . "\n", FILE_APPEND | LOCK_EX);
 
   // Form submission validated; send message
   $name = $_POST['name'];
@@ -209,6 +215,22 @@ function hc_CheckStamp() {
   } else {
     PRINT_DEBUG("Difficulty target was not met.");
     return false;
+  }
+
+  // check if this puzzle has already been used to submit a message
+  $savedStamps = 0;
+  if (($handle = fopen(STAMP_LOG, "r")) !== FALSE) {
+    while (($data = fgetcsv($handle, 1000, "\n")) !== FALSE) {
+      if ($data === $stamp)
+        return false;
+      $savedStamps++;
+    }
+    fclose($handle);
+  }
+
+  // truncate the log if it starts getting long
+  if ($savedStamps > 1000) {
+    file_put_contents(STAMP_LOG, "$stamp\n");
   }
 
   return true;
